@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>D-day 계산기 - 디데이, 100일·1000일 기념일, N일 후 날짜 계산</title>
+<meta name="description" content="시험·여행·전역일까지 남은 날짜(D-day)를 계산하고, 사귄 날·생일로부터 100일, 200일, 1000일, 1주년 기념일 날짜를 한 번에 확인하세요. 오늘부터 N일 후 날짜 계산도 가능합니다.">
+<link rel="canonical" href="https://leeyc80.github.io/tiny-tools/d-day/">
+<meta property="og:title" content="D-day 계산기 - 디데이, 100일 기념일 계산">
+<meta property="og:description" content="남은 날짜, 100일·1000일 기념일, N일 후 날짜를 바로 계산">
+<meta property="og:type" content="website">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 승인 후 ca-pub 값 교체 후 주석 해제
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+-->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"D-day 계산기","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"KRW"}}
+</script>
+<style>
+.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.tabs button[aria-selected=true]{background:var(--accent);border-color:var(--accent);color:#fff}
+.field{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:10px}
+.field label{font-size:14px;color:var(--muted);min-width:56px}
+.field input[type=date],.field input[type=text],.field input[type=number]{padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);font:inherit;min-width:0}
+.big{font-size:44px;font-weight:700;letter-spacing:-1px;margin:6px 0 0;font-variant-numeric:tabular-nums}
+.sub{color:var(--muted);margin:0}
+table{width:100%;border-collapse:collapse;font-size:15px;font-variant-numeric:tabular-nums}
+td,th{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left}
+th{font-size:13px;color:var(--muted);font-weight:500}
+tr.past td{color:var(--muted)}
+tr.next td{font-weight:700}
+td:last-child,th:last-child{text-align:right}
+.panel[hidden]{display:none}
+.check{font-size:14px;color:var(--muted);display:flex;gap:6px;align-items:center}
+</style>
+</head>
+<body>
+<header><a href="../">← 모든 도구</a></header>
+<main>
+  <h1>D-day 계산기</h1>
+  <p class="lead">목표일까지 남은 날, 기념일, N일 후 날짜를 계산합니다.</p>
+
+  <div class="tabs" role="tablist">
+    <button role="tab" data-tab="dday" aria-selected="true">D-day</button>
+    <button role="tab" data-tab="anniv" aria-selected="false">기념일 (100일·1000일)</button>
+    <button role="tab" data-tab="plus" aria-selected="false">N일 후 날짜</button>
+  </div>
+
+  <section class="panel card" id="p-dday">
+    <div class="field"><label for="dTitle">이름</label><input id="dTitle" type="text" placeholder="예: 시험, 여행, 전역" maxlength="30"></div>
+    <div class="field"><label for="dDate">목표일</label><input id="dDate" type="date"></div>
+    <div class="field" style="gap:6px">
+      <button data-preset="xmas">크리스마스</button>
+      <button data-preset="newyear">새해</button>
+      <button data-preset="d100">오늘부터 100일</button>
+    </div>
+    <p class="big" id="dBig">-</p>
+    <p class="sub" id="dSub"></p>
+    <div class="row"><button class="primary" id="share">링크 복사</button></div>
+  </section>
+
+  <section class="panel card" id="p-anniv" hidden>
+    <div class="field"><label for="aDate">시작일</label><input id="aDate" type="date"></div>
+    <label class="check"><input type="checkbox" id="aFirst" checked> 시작일을 1일로 계산 (연애·출생 기념일 방식)</label>
+    <p class="big" id="aBig">-</p>
+    <p class="sub" id="aSub"></p>
+    <table style="margin-top:12px"><thead><tr><th>기념일</th><th>날짜</th><th>남은 날</th></tr></thead><tbody id="aBody"></tbody></table>
+  </section>
+
+  <section class="panel card" id="p-plus" hidden>
+    <div class="field"><label for="pDate">기준일</label><input id="pDate" type="date"></div>
+    <div class="field"><label for="pN">일수</label><input id="pN" type="number" value="100" step="1" style="width:110px"> 일 <button id="pSign">후</button></div>
+    <label class="check"><input type="checkbox" id="pFirst"> 기준일을 1일로 포함</label>
+    <p class="big" id="pBig">-</p>
+    <p class="sub" id="pSub"></p>
+  </section>
+
+  <div class="ad"><!-- 광고 슬롯 1 --></div>
+
+  <article>
+    <h2>D-day는 어떻게 계산하나요?</h2>
+    <p>오늘 날짜와 목표일 사이의 날수를 셉니다. 목표일 당일이 <b>D-Day</b>, 하루 전이 D-1, 하루 지나면 D+1입니다. 시간은 무시하고 날짜만 비교합니다.</p>
+    <h2>100일 기념일은 왜 하루 차이가 나나요?</h2>
+    <p>연애 기념일이나 아기 백일은 보통 <b>시작한 날을 1일</b>로 셉니다. 그래서 1월 1일에 시작했다면 100일은 4월 10일(평년 기준)이 됩니다. 시작일을 0일로 세고 싶다면 '시작일을 1일로 계산'을 끄세요.</p>
+    <h2>전역일, 입대일 계산도 되나요?</h2>
+    <p>전역 예정일을 목표일로 넣으면 남은 날이 나옵니다. 입대일을 기념일 탭의 시작일로 넣으면 오늘이 복무 며칠째인지 확인할 수 있습니다.</p>
+    <h2>링크로 공유할 수 있나요?</h2>
+    <p>D-day 탭의 '링크 복사'를 누르면 이름과 날짜가 담긴 주소가 복사됩니다. 받은 사람이 열면 같은 D-day가 바로 보입니다.</p>
+  </article>
+
+  <div class="ad"><!-- 광고 슬롯 2 --></div>
+</main>
+<footer>© 작은 도구들 · <a href="../privacy.html">개인정보처리방침</a></footer>
+
+<script>
+const $ = id => document.getElementById(id);
+const DAY = 86400000;
+const WD = ['일', '월', '화', '수', '목', '금', '토'];
+const fmt = n => n.toLocaleString('ko-KR');
+
+// 날짜는 UTC 자정 기준 정수 일수로만 다뤄 서머타임·시간대 오차를 피한다.
+const today = () => { const d = new Date(); return Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / DAY; };
+const parse = s => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || ''); return m ? Date.UTC(+m[1], m[2] - 1, +m[3]) / DAY : null; };
+const iso = n => new Date(n * DAY).toISOString().slice(0, 10);
+const kdate = n => { const d = new Date(n * DAY); return `${d.getUTCFullYear()}. ${d.getUTCMonth() + 1}. ${d.getUTCDate()}. (${WD[d.getUTCDay()]})`; };
+const dlabel = diff => diff === 0 ? 'D-Day' : diff > 0 ? `D-${fmt(diff)}` : `D+${fmt(-diff)}`;
+const addYears = (n, y) => { const d = new Date(n * DAY); const t = Date.UTC(d.getUTCFullYear() + y, d.getUTCMonth(), d.getUTCDate()) / DAY;
+  return new Date(t * DAY).getUTCDate() !== d.getUTCDate() ? t - 1 : t; }; // 2/29 → 2/28
+
+/* 탭 */
+function showTab(name) {
+  document.querySelectorAll('[role=tab]').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === name));
+  document.querySelectorAll('.panel').forEach(p => p.hidden = p.id !== 'p-' + name);
+  try { localStorage.setItem('dd-tab', name); } catch (e) {}
+}
+document.querySelectorAll('[role=tab]').forEach(b => b.onclick = () => showTab(b.dataset.tab));
+
+/* D-day */
+function renderDday() {
+  const t = parse($('dDate').value), title = $('dTitle').value.trim();
+  if (t === null) { $('dBig').textContent = '-'; $('dSub').textContent = '목표일을 선택하세요'; return; }
+  const diff = t - today();
+  $('dBig').textContent = (title ? title + ' ' : '') + dlabel(diff);
+  const w = Math.floor(Math.abs(diff) / 7), r = Math.abs(diff) % 7;
+  $('dSub').textContent = `${kdate(t)} · ` + (diff === 0 ? '오늘입니다' :
+    `${fmt(Math.abs(diff))}일 ${diff > 0 ? '남음' : '지남'}` + (Math.abs(diff) >= 7 ? ` (${fmt(w)}주 ${r}일)` : ''));
+  save();
+}
+document.querySelectorAll('[data-preset]').forEach(b => b.onclick = () => {
+  const now = new Date(), y = now.getFullYear(), td = today();
+  let t, name;
+  if (b.dataset.preset === 'xmas') { t = Date.UTC(y, 11, 25) / DAY; if (t < td) t = Date.UTC(y + 1, 11, 25) / DAY; name = '크리스마스'; }
+  if (b.dataset.preset === 'newyear') { t = Date.UTC(y + 1, 0, 1) / DAY; name = '새해'; }
+  if (b.dataset.preset === 'd100') { t = td + 100; name = ''; }
+  $('dDate').value = iso(t); $('dTitle').value = name; renderDday();
+});
+$('dDate').oninput = $('dTitle').oninput = renderDday;
+$('share').onclick = async () => {
+  const u = new URL(location.href.split('?')[0]);
+  if ($('dDate').value) u.searchParams.set('d', $('dDate').value);
+  if ($('dTitle').value.trim()) u.searchParams.set('t', $('dTitle').value.trim());
+  try { await navigator.clipboard.writeText(u.toString()); $('share').textContent = '복사됨'; }
+  catch (e) { prompt('아래 주소를 복사하세요', u.toString()); }
+  setTimeout(() => $('share').textContent = '링크 복사', 1200);
+};
+
+/* 기념일 */
+function renderAnniv() {
+  const s = parse($('aDate').value), first = $('aFirst').checked, td = today(), body = $('aBody');
+  body.innerHTML = '';
+  if (s === null) { $('aBig').textContent = '-'; $('aSub').textContent = '시작일을 선택하세요'; return; }
+  const nth = td - s + (first ? 1 : 0);
+  $('aBig').textContent = nth >= (first ? 1 : 0) ? `${fmt(nth)}일째` : dlabel(s - td);
+  $('aSub').textContent = `${kdate(s)} 시작 · 오늘 ${kdate(td)}`;
+  const rows = [];
+  for (const n of [50, 100, 200, 300, 365, 500, 600, 700, 800, 900, 1000, 1500, 2000, 3000, 5000, 10000])
+    rows.push([`${fmt(n)}일`, s + n - (first ? 1 : 0)]);
+  for (let y = 1; y <= 30; y++) rows.push([`${y}주년`, addYears(s, y)]);
+  rows.sort((a, b) => a[1] - b[1]);
+  let nextMarked = false;
+  for (const [label, d] of rows) {
+    if (d < td - 400 || d > td + 365 * 12) continue; // 너무 먼 과거·미래는 생략
+    const tr = document.createElement('tr');
+    if (d < td) tr.className = 'past';
+    else if (!nextMarked) { tr.className = 'next'; nextMarked = true; }
+    tr.innerHTML = `<td>${label}</td><td>${kdate(d)}</td><td>${dlabel(d - td)}</td>`;
+    body.appendChild(tr);
+  }
+  save();
+}
+$('aDate').oninput = $('aFirst').onchange = renderAnniv;
+
+/* N일 후 */
+let sign = 1;
+function renderPlus() {
+  const b = parse($('pDate').value), n = Math.trunc(+$('pN').value || 0), first = $('pFirst').checked;
+  if (b === null) { $('pBig').textContent = '-'; $('pSub').textContent = '기준일을 선택하세요'; return; }
+  const adj = first && n > 0 ? 1 : 0;
+  const r = b + sign * (n - adj);
+  $('pBig').textContent = kdate(r);
+  $('pSub').textContent = `${kdate(b)}부터 ${fmt(n)}일 ${sign > 0 ? '후' : '전'} · 오늘 기준 ${dlabel(r - today())}`;
+  save();
+}
+$('pSign').onclick = () => { sign = -sign; $('pSign').textContent = sign > 0 ? '후' : '전'; renderPlus(); };
+$('pDate').oninput = $('pN').oninput = $('pFirst').onchange = renderPlus;
+
+/* 저장·복원 */
+const keys = ['dTitle', 'dDate', 'aDate', 'pDate', 'pN'];
+function save() { try { localStorage.setItem('dd-state', JSON.stringify(Object.fromEntries(keys.map(k => [k, $(k).value])))); } catch (e) {} }
+try { const st = JSON.parse(localStorage.getItem('dd-state') || '{}'); keys.forEach(k => { if (st[k] != null) $(k).value = st[k]; }); } catch (e) {}
+
+const q = new URLSearchParams(location.search);
+if (parse(q.get('d')) !== null) { $('dDate').value = q.get('d'); $('dTitle').value = (q.get('t') || '').slice(0, 30); showTab('dday'); }
+else { let tab = 'dday'; try { tab = localStorage.getItem('dd-tab') || 'dday'; } catch (e) {} showTab(['dday', 'anniv', 'plus'].includes(tab) ? tab : 'dday'); }
+if (!$('pDate').value) $('pDate').value = iso(today());
+renderDday(); renderAnniv(); renderPlus();
+</script>
+</body>
+</html>
