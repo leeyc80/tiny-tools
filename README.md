@@ -3,7 +3,7 @@
 하루 1달러짜리 작은 웹앱을 하나씩 쌓아 가는 프로젝트. 모든 도구를 도메인 하나 아래 하위 경로로 둔다(AdSense 승인 1회, SEO 권한 공유).
 
 ## 배포 전 바꿀 것
-- `YOUR-DOMAIN` → 실제 도메인 (canonical, robots.txt, sitemap.xml)
+- 도메인: 현재 `leeyc80.github.io/tiny-tools/` (커스텀 도메인 연결 시 canonical, robots.txt, sitemap.xml 일괄 교체)
 - `ca-pub-XXXX` → AdSense 퍼블리셔 ID (각 페이지 head, ads.txt)
 - `YOUR-EMAIL` → privacy.html
 
