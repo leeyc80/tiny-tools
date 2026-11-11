@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>더치페이 계산기 - N빵, 팁·환율 포함 1인당 금액 계산 | 해외여행 정산</title>
+<meta name="description" content="총 금액과 인원을 넣으면 1인당 낼 금액을 바로 계산합니다. 100원·1000원 단위 올림, 술값처럼 일부 인원만 나누는 항목, 해외여행 팁(%)과 실시간 환율로 원화 환산까지 지원합니다.">
+<link rel="canonical" href="https://leeyc80.github.io/tiny-tools/dutch-pay/">
+<meta property="og:title" content="더치페이 계산기 - N빵, 팁·환율 포함 1인당 금액">
+<meta property="og:description" content="인원별 금액, 단위 올림, 술값 따로, 팁, 원화 환산까지">
+<meta property="og:type" content="website">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 승인 후 ca-pub 값 교체 후 주석 해제
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+-->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"더치페이 계산기","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"KRW"}}
+</script>
+<style>
+.field{display:flex;flex-wrap:nowrap;gap:8px;align-items:center;margin-bottom:12px}
+.field>label:first-child{font-size:14px;color:var(--muted);width:72px;flex:none}
+input[type=text],input[type=number],select{padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);font:inherit;min-width:0}
+#total{font-size:20px;flex:1 1 100px;max-width:240px;text-align:right;font-variant-numeric:tabular-nums}
+.step{display:flex;align-items:center;gap:4px}
+.step input{width:64px;text-align:center}
+.step button{width:40px;padding:8px 0}
+.chips{display:flex;gap:6px;flex-wrap:wrap;flex:1;min-width:0}
+.chips button{padding:8px 11px}
+.chips button[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:#fff}
+details{margin-top:4px}
+summary{cursor:pointer;color:var(--accent);font-size:15px}
+.big{font-size:40px;font-weight:700;letter-spacing:-1px;margin:4px 0 0;font-variant-numeric:tabular-nums}
+.big.two{font-size:30px;line-height:1.35}
+.big small{font-size:15px;font-weight:500;color:var(--muted);letter-spacing:0;margin-right:8px}
+.conv{font-size:20px;font-weight:600;margin:2px 0 0;color:var(--accent);font-variant-numeric:tabular-nums}
+.conv:empty{display:none}
+.sub{color:var(--muted);margin:0;font-size:14px}
+.lines{margin:12px 0 0;padding:0;list-style:none;font-variant-numeric:tabular-nums}
+.lines li{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line);gap:12px}
+.lines li span:first-child{color:var(--muted)}
+.lines li span:last-child{text-align:right}
+#fxBox[hidden]{display:none}
+#fxRate{width:120px;text-align:right}
+#fxLeft{white-space:nowrap}
+#cur{flex:none}
+.fxnote{font-size:12px;color:var(--muted);margin:0 0 0 80px}
+@media (max-width:420px){.fxnote{margin-left:0}}
+</style>
+</head>
+<body>
+<header><a href="../">← 모든 도구</a></header>
+<main>
+  <h1>더치페이 계산기</h1>
+  <p class="lead">총 금액과 인원만 넣으면 1인당 낼 금액이 나옵니다. 팁, 술값 따로 나누기, 해외 결제 원화 환산도 됩니다.</p>
+
+  <div class="card">
+    <div class="field">
+      <label for="total">총 금액</label>
+      <input id="total" type="text" inputmode="decimal" placeholder="0" autocomplete="off">
+      <select id="cur" aria-label="결제 통화"></select>
+    </div>
+    <div class="field">
+      <label for="people">인원</label>
+      <div class="step"><button data-step="people:-1" aria-label="인원 줄이기">−</button><input id="people" type="number" min="1" max="100" value="4"><button data-step="people:1" aria-label="인원 늘리기">+</button></div>
+    </div>
+    <div class="field" style="align-items:flex-start">
+      <label style="padding-top:8px">팁</label>
+      <div class="chips" id="tips">
+        <button data-tip="0" aria-pressed="true">없음</button><button data-tip="10">10%</button><button data-tip="15">15%</button><button data-tip="18">18%</button><button data-tip="20">20%</button>
+        <input id="tipCustom" type="number" min="0" max="100" step="1" placeholder="직접 %" style="width:84px" aria-label="팁 직접 입력">
+      </div>
+    </div>
+    <div class="field">
+      <label for="round">올림 단위</label>
+      <select id="round"></select>
+    </div>
+    <div id="fxBox" hidden>
+      <div class="field">
+        <label for="home">내 통화</label>
+        <select id="home" aria-label="환산할 통화"></select>
+      </div>
+      <div class="field">
+        <label for="fxRate">환율</label>
+        <span class="sub" id="fxLeft">1 USD =</span>
+        <input id="fxRate" type="text" inputmode="decimal" autocomplete="off">
+        <button id="fxReload" title="최신 환율 다시 불러오기">↻</button>
+      </div>
+      <p class="fxnote" id="fxNote"></p>
+    </div>
+    <details id="extraBox">
+      <summary>일부 인원만 나눌 금액 (술값 등)</summary>
+      <div class="field" style="margin-top:12px">
+        <label for="extra">금액</label>
+        <input id="extra" type="text" inputmode="decimal" placeholder="0" style="flex:1 1 100px;max-width:160px;text-align:right" autocomplete="off">
+        <span class="sub">(총액에 포함)</span>
+      </div>
+      <div class="field">
+        <label for="extraN">나눌 인원</label>
+        <div class="step"><button data-step="extraN:-1" aria-label="줄이기">−</button><input id="extraN" type="number" min="1" value="2"><button data-step="extraN:1" aria-label="늘리기">+</button></div>
+      </div>
+    </details>
+  </div>
+
+  <div class="card">
+    <p class="sub" id="label">1인당</p>
+    <p class="big" id="big">0원</p>
+    <p class="conv" id="conv"></p>
+    <p class="sub" id="sub"></p>
+    <ul class="lines" id="lines"></ul>
+    <div class="row"><button class="primary" id="copy">정산 내용 복사</button><button id="reset">초기화</button></div>
+  </div>
+
+  <div class="ad"><!-- 광고 슬롯 1 --></div>
+
+  <article>
+    <h2>올림 단위는 왜 필요한가요?</h2>
+    <p>45,000원을 7명이 나누면 6,428.57…원이라 송금하기 불편합니다. 100원 단위로 올리면 1인당 6,500원이 되고, 모두 합치면 45,500원이라 500원이 남습니다. 남는 금액은 결과에 '남는 금액'으로 표시되니 총무가 돌려주거나 다음 모임에 쓰면 됩니다.</p>
+    <h2>술 안 마신 사람은 덜 내게 할 수 있나요?</h2>
+    <p>'일부 인원만 나눌 금액'에 술값과 마신 사람 수를 넣으세요. 나머지 금액은 전원이 똑같이 나누고, 술값은 마신 사람끼리만 나눠서 두 그룹의 금액을 따로 보여 줍니다.</p>
+    <h2>해외에서 쓴 돈을 원화로 얼마인지 보려면?</h2>
+    <p>통화를 달러·유로·바트 등으로 바꾸면 '내 통화'와 환율 칸이 나타나고, 1인당 금액이 원화로 함께 표시됩니다. 환율은 유럽중앙은행(ECB)이 영업일마다 발표하는 기준환율을 <a href="https://frankfurter.dev/">Frankfurter</a>를 통해 불러옵니다. 실제 카드 청구 금액은 카드사 환율과 해외결제 수수료(보통 1~2%) 때문에 조금 다를 수 있으니, 정확히 맞추고 싶다면 환율 칸에 카드 명세서의 환율을 직접 넣으세요.</p>
+    <h2>해외에서 팁은 얼마나 주나요?</h2>
+    <p>미국 식당은 보통 세금 전 금액의 15~20%, 캐나다는 15~18% 정도가 일반적입니다. 유럽과 일본은 서비스 요금이 포함되거나 팁 문화가 약한 곳이 많으니 영수증에 'service charge'가 있는지 먼저 확인하세요. 팁은 '일부 인원 금액'을 포함한 전체 금액에 같은 비율로 붙습니다.</p>
+    <h2>입력한 내용이 저장되나요?</h2>
+    <p>모든 계산은 브라우저 안에서만 이루어지며 서버로 전송되지 않습니다. 환율을 불러올 때만 통화 이름(예: USD, KRW)을 환율 서비스에 요청합니다.</p>
+  </article>
+
+  <div class="ad"><!-- 광고 슬롯 2 --></div>
+</main>
+<footer>© 작은 도구들 · <a href="../privacy.html">개인정보처리방침</a></footer>
+
+<script>
+const $ = id => document.getElementById(id);
+// [코드, 표시 이름, 앞기호, 뒤기호, 소수 자리, 올림 단위들, 기본 올림]
+const CUR_LIST = [
+  ['KRW', '원 KRW', '', '원', 0, [1, 10, 100, 1000], 100],
+  ['USD', '$ USD', '$', '', 2, [0.01, 0.25, 1, 5], 0.01],
+  ['EUR', '€ EUR', '€', '', 2, [0.01, 0.5, 1, 5], 0.01],
+  ['JPY', '엔 JPY', '', '엔', 0, [1, 10, 100, 1000], 1],
+  ['CNY', '위안 CNY', '', '위안', 2, [0.01, 1, 10], 0.01],
+  ['GBP', '£ GBP', '£', '', 2, [0.01, 0.5, 1, 5], 0.01],
+  ['THB', '바트 THB', '', '바트', 2, [0.01, 1, 10, 100], 1],
+  ['PHP', '페소 PHP', '', '페소', 2, [0.01, 1, 10, 100], 1],
+  ['SGD', 'S$ SGD', 'S$', '', 2, [0.01, 0.5, 1], 0.01],
+  ['HKD', 'HK$ HKD', 'HK$', '', 2, [0.01, 1, 10], 0.01],
+  ['AUD', 'A$ AUD', 'A$', '', 2, [0.01, 0.5, 1, 5], 0.01],
+  ['CAD', 'C$ CAD', 'C$', '', 2, [0.01, 0.25, 1, 5], 0.01],
+  ['NZD', 'NZ$ NZD', 'NZ$', '', 2, [0.01, 0.5, 1, 5], 0.01],
+  ['CHF', '프랑 CHF', '', ' CHF', 2, [0.01, 0.5, 1, 5], 0.01],
+  ['MYR', '링깃 MYR', '', ' 링깃', 2, [0.01, 1, 10], 0.01],
+  ['IDR', '루피아 IDR', '', ' 루피아', 0, [1, 1000, 10000], 1000],
+  ['INR', '₹ INR', '₹', '', 2, [0.01, 1, 10, 100], 1],
+  ['TRY', '리라 TRY', '', ' 리라', 2, [0.01, 1, 10, 100], 1],
+  ['MXN', 'MX$ MXN', 'MX$', '', 2, [0.01, 1, 10], 1],
+];
+const CUR = Object.fromEntries(CUR_LIST.map(([code, name, pre, unit, dec, rounds, def]) => [code, {code, name, pre, unit, dec, rounds, def}]));
+const roundLabel = (c, v) => (v === 10 ** -c.dec ? '올림 없음' : c.pre + v.toLocaleString('ko-KR') + c.unit.trim());
+
+let tip = 0, fx = null;              // fx: {from, to, rate, date, manual}
+const cur = () => CUR[$('cur').value];
+const home = () => CUR[$('home').value];
+const num = s => { const n = parseFloat(String(s).replace(/[^\d.]/g, '')); return isFinite(n) && n > 0 ? n : 0; };
+const fix = (n, c) => Math.round(n * 10 ** c.dec) / 10 ** c.dec;
+const money = (n, c = cur()) => c.pre + fix(n, c).toLocaleString('ko-KR', {minimumFractionDigits: c.dec, maximumFractionDigits: c.dec}) + c.unit;
+// 부동소수 오차 없이 올림: 최소 화폐 단위 정수로 바꿔 계산
+const ceilTo = (v, step) => { const k = 10 ** cur().dec, s = Math.round(step * k); return Math.ceil(Math.round(v * k * 1e6) / 1e6 / s) * s / k; };
+const int = (id, min, max) => Math.min(max, Math.max(min, Math.trunc(+$(id).value) || min));
+
+$('cur').innerHTML = $('home').innerHTML = CUR_LIST.map(([c, n]) => `<option value="${c}">${n}</option>`).join('');
+
+function fillRounds(keep) {
+  const c = cur(), sel = $('round');
+  sel.innerHTML = c.rounds.map(v => `<option value="${v}">${roundLabel(c, v)}</option>`).join('');
+  sel.value = keep && c.rounds.some(r => r == keep) ? keep : c.def;
+}
+function formatInput(el, c = cur()) {
+  const raw = el.value.replace(/[^\d.]/g, '');
+  if (!raw) { el.value = ''; return; }
+  const [i, d] = raw.split('.');
+  el.value = (+i).toLocaleString('ko-KR') + (c.dec && d !== undefined ? '.' + d.slice(0, c.dec) : '');
+}
+
+/* 환율 */
+const fxActive = () => cur().code !== home().code;
+const fxRate = () => (fxActive() && fx && fx.from === cur().code && fx.to === home().code ? fx.rate : 0);
+const toHome = n => money(n * fxRate(), home());
+
+async function loadFx(force) {
+  const from = cur().code, to = home().code;
+  $('fxBox').hidden = from === to;
+  if (from === to) { fx = null; calc(); return; }
+  $('fxLeft').textContent = `1 ${from} =`;
+  const key = `dp-fx-${from}-${to}`;
+  let cached = null;
+  try { cached = JSON.parse(localStorage.getItem(key) || 'null'); } catch (e) {}
+  const fresh = cached && Date.now() - cached.at < 6 * 3600e3;
+  if (cached && !force) showFx({from, to, ...cached});
+  if (fresh && !force) return;
+  $('fxNote').textContent = '환율 불러오는 중…';
+  try {
+    const r = await fetch(`https://api.frankfurter.dev/v1/latest?from=${from}&to=${to}`);
+    if (!r.ok) throw new Error(r.status);
+    const j = await r.json(), rate = j.rates[to];
+    if (!rate) throw new Error('no rate');
+    if (cur().code !== from || home().code !== to) return;   // 그 사이 통화가 바뀜
+    const v = {rate, date: j.date, at: Date.now()};
+    try { localStorage.setItem(key, JSON.stringify(v)); } catch (e) {}
+    showFx({from, to, ...v});
+  } catch (e) {
+    if (cur().code !== from || home().code !== to) return;
+    if (cached) showFx({from, to, ...cached}, ' · 최신 환율을 불러오지 못해 저장된 값 사용');
+    else { fx = null; $('fxRate').value = ''; $('fxNote').textContent = '환율을 불러오지 못했습니다. 환율을 직접 입력하세요.'; calc(); }
+  }
+}
+function showFx(v, extra = '') {
+  fx = {from: v.from, to: v.to, rate: v.rate, date: v.date, manual: false};
+  $('fxRate').value = v.rate.toLocaleString('ko-KR', {maximumFractionDigits: v.rate < 1 ? 6 : 4});
+  $('fxNote').textContent = `${v.date} 유럽중앙은행 기준환율${extra}. 카드 환율과 다를 수 있으니 필요하면 직접 고치세요.`;
+  calc();
+}
+$('fxRate').addEventListener('input', () => {
+  const r = num($('fxRate').value);
+  fx = r ? {from: cur().code, to: home().code, rate: r, date: '', manual: true} : null;
+  $('fxNote').textContent = r ? '직접 입력한 환율로 계산합니다. ↻를 누르면 기준환율로 돌아갑니다.' : '환율을 입력하세요.';
+  calc();
+});
+$('fxReload').onclick = () => loadFx(true);
+
+/* 계산 */
+function calc() {
+  const c = cur(), total = num($('total').value), n = int('people', 1, 100);
+  const useExtra = $('extraBox').open;
+  const extra = useExtra ? Math.min(num($('extra').value), total) : 0;
+  const k = useExtra ? int('extraN', 1, n) : n;
+  const step = +$('round').value, mult = 1 + tip / 100;
+  const tipAmt = total * tip / 100, grand = total + tipAmt;
+  const base = (total - extra) * mult / n;   // 전원 공통
+  const add = extra * mult / k;              // 일부 인원 추가분
+  const rate = fxRate(), lines = [];
+  let paid, text;
+
+  if (extra > 0 && k < n) {
+    const a = ceilTo(base + add, step), b = ceilTo(base, step);
+    paid = a * k + b * (n - k);
+    $('label').textContent = '1인당';
+    $('big').innerHTML = `<small>${k}명</small>${money(a)}<br><small>${n - k}명</small>${money(b)}`;
+    $('big').classList.add('two');
+    $('conv').textContent = rate ? `≈ ${toHome(a)} / ${toHome(b)}` : '';
+    $('sub').textContent = `추가 항목 나누는 ${k}명은 ${money(a)}, 나머지 ${n - k}명은 ${money(b)}`;
+    text = `${k}명: ${money(a)}씩${rate ? ` (≈ ${toHome(a)})` : ''}\n${n - k}명: ${money(b)}씩${rate ? ` (≈ ${toHome(b)})` : ''}`;
+  } else {
+    const a = ceilTo(grand / n, step), exact = fix(grand / n, c);
+    paid = a * n;
+    $('label').textContent = `1인당 (${n}명)`;
+    $('big').textContent = money(a);
+    $('big').classList.remove('two');
+    $('conv').textContent = rate && total ? `≈ ${toHome(a)}` : '';
+    $('sub').textContent = grand && exact !== a ? `정확히는 ${money(exact)}` : '';
+    text = `${n}명: ${money(a)}씩${rate ? ` (≈ ${toHome(a)})` : ''}`;
+  }
+  lines.push(['음식·주문 금액', money(total)]);
+  if (tip) lines.push([`팁 ${tip}%`, money(tipAmt)], ['팁 포함 합계', money(grand)]);
+  if (rate) lines.push([`합계 ${home().code} 환산`, '≈ ' + toHome(grand)]);
+  lines.push(['모은 금액', money(paid)]);
+  const left = fix(paid - grand, c);
+  if (left > 0) lines.push(['남는 금액 (총무)', money(left)]);
+  $('lines').innerHTML = lines.map(([a, b]) => `<li><span>${a}</span><span>${b}</span></li>`).join('');
+  const rateText = rate ? `\n환율 1 ${c.code} = ${rate.toLocaleString('ko-KR', {maximumFractionDigits: 4})} ${home().code}${fx && fx.date ? ` (${fx.date})` : ''}` : '';
+  $('copy').dataset.text = `[더치페이] 총 ${money(grand)}${tip ? ` (팁 ${tip}% 포함)` : ''}${rate ? ` ≈ ${toHome(grand)}` : ''}\n${text}${rateText}`;
+  save();
+}
+
+/* 이벤트 */
+['total', 'extra'].forEach(id => $(id).addEventListener('input', e => { formatInput(e.target); calc(); }));
+['people', 'extraN', 'round'].forEach(id => $(id).addEventListener('input', calc));
+$('extraBox').addEventListener('toggle', calc);
+document.querySelectorAll('[data-step]').forEach(b => b.onclick = () => {
+  const [id, d] = b.dataset.step.split(':');
+  $(id).value = Math.max(1, Math.min(100, (Math.trunc(+$(id).value) || 1) + +d));
+  calc();
+});
+$('tips').addEventListener('click', e => {
+  const b = e.target.closest('[data-tip]'); if (!b) return;
+  tip = +b.dataset.tip; $('tipCustom').value = '';
+  document.querySelectorAll('[data-tip]').forEach(x => x.setAttribute('aria-pressed', x === b));
+  calc();
+});
+$('tipCustom').addEventListener('input', () => {
+  tip = Math.min(100, Math.max(0, +$('tipCustom').value || 0));
+  document.querySelectorAll('[data-tip]').forEach(x => x.setAttribute('aria-pressed', $('tipCustom').value === '' && +x.dataset.tip === tip));
+  calc();
+});
+$('cur').addEventListener('change', () => { fillRounds(); formatInput($('total')); formatInput($('extra')); fx = null; loadFx(); });
+$('home').addEventListener('change', () => { fx = null; loadFx(); });
+$('copy').onclick = async () => {
+  try { await navigator.clipboard.writeText($('copy').dataset.text); $('copy').textContent = '복사됨'; }
+  catch (e) { prompt('아래 내용을 복사하세요', $('copy').dataset.text); }
+  setTimeout(() => $('copy').textContent = '정산 내용 복사', 1200);
+};
+$('reset').onclick = () => {
+  $('total').value = $('extra').value = $('tipCustom').value = ''; $('people').value = 4; $('extraN').value = 2;
+  tip = 0; document.querySelectorAll('[data-tip]').forEach(x => x.setAttribute('aria-pressed', x.dataset.tip === '0'));
+  $('extraBox').open = false; calc();
+};
+
+/* 저장·복원 (금액은 저장하지 않음) */
+function save() { try { localStorage.setItem('dp-state', JSON.stringify({cur: $('cur').value, home: $('home').value, people: $('people').value, round: $('round').value})); } catch (e) {} }
+let st = {};
+try { st = JSON.parse(localStorage.getItem('dp-state') || '{}'); } catch (e) {}
+$('cur').value = CUR[st.cur] ? st.cur : 'KRW';
+$('home').value = CUR[st.home] ? st.home : 'KRW';
+if (st.people) $('people').value = st.people;
+fillRounds(st.round);
+calc();
+loadFx();
+</script>
+</body>
+</html>
