@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>퍼센트 계산기 - 할인율, 증감률, 몇 퍼센트인지, 부가세 계산</title>
+<meta name="description" content="A의 B%는 얼마인지, A는 B의 몇 %인지, 증가율·감소율, 할인가와 원래 가격 역산, 부가세(VAT 10%) 포함·별도 금액까지 한 페이지에서 바로 계산하세요.">
+<link rel="canonical" href="https://leeyc80.github.io/tiny-tools/percent/">
+<meta property="og:title" content="퍼센트 계산기 - 할인율, 증감률, 부가세">
+<meta property="og:description" content="몇 %인지, 증감률, 할인가, 원래 가격, 부가세를 바로 계산">
+<meta property="og:type" content="website">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- AdSense: 승인 후 ca-pub 값 교체 후 주석 해제
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+-->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"퍼센트 계산기","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"KRW"}}
+</script>
+<style>
+.calc h2{font-size:16px;margin:0 0 10px;color:var(--muted);font-weight:600}
+.q{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;font-size:17px}
+.q input{width:auto;flex:1 1 100px;max-width:170px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);font:inherit;text-align:right;font-variant-numeric:tabular-nums;min-width:0}
+.q select{padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);font:inherit}
+.ans{margin:12px 0 0;font-size:24px;font-weight:700;font-variant-numeric:tabular-nums;cursor:pointer;word-break:break-all}
+.ans:empty::before{content:'-';color:var(--muted)}
+.ans .up{color:#dc2626}.ans .down{color:#2563eb}
+@media (prefers-color-scheme:dark){.ans .up{color:#f87171}.ans .down{color:#60a5fa}}
+.how{margin:2px 0 0;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.toc{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.toc a{font-size:14px;padding:6px 10px;border:1px solid var(--line);border-radius:999px;color:var(--fg);text-decoration:none;background:var(--card)}
+</style>
+</head>
+<body>
+<header><a href="../">← 모든 도구</a></header>
+<main>
+  <h1>퍼센트 계산기</h1>
+  <p class="lead">필요한 계산 칸에 숫자만 넣으세요. 결과를 누르면 복사됩니다.</p>
+
+  <nav class="toc">
+    <a href="#c1">A의 B%</a><a href="#c2">몇 %인지</a><a href="#c3">증감률</a><a href="#c4">할인가</a><a href="#c5">원래 가격</a><a href="#c6">부가세</a>
+  </nav>
+
+  <section class="card calc" id="c1">
+    <h2>전체의 몇 %는 얼마?</h2>
+    <div class="q"><input data-n="a" inputmode="decimal" placeholder="200,000"> 의 <input data-n="b" inputmode="decimal" placeholder="15" style="width:80px"> % 는?</div>
+    <p class="ans"></p><p class="how"></p>
+  </section>
+
+  <section class="card calc" id="c2">
+    <h2>일부는 전체의 몇 %?</h2>
+    <div class="q"><input data-n="a" inputmode="decimal" placeholder="30"> 은(는) <input data-n="b" inputmode="decimal" placeholder="120"> 의 몇 %?</div>
+    <p class="ans"></p><p class="how"></p>
+  </section>
+
+  <section class="card calc" id="c3">
+    <h2>증가율 · 감소율</h2>
+    <div class="q"><input data-n="a" inputmode="decimal" placeholder="50,000"> 에서 <input data-n="b" inputmode="decimal" placeholder="65,000"> (으)로 변하면?</div>
+    <p class="ans"></p><p class="how"></p>
+  </section>
+
+  <section class="card calc" id="c4">
+    <h2>할인가 · 인상가</h2>
+    <div class="q"><input data-n="a" inputmode="decimal" placeholder="39,900"> 원을 <input data-n="b" inputmode="decimal" placeholder="30" style="width:80px"> %
+      <select data-n="dir"><option value="-1">할인</option><option value="1">인상</option></select> 하면?</div>
+    <p class="ans"></p><p class="how"></p>
+  </section>
+
+  <section class="card calc" id="c5">
+    <h2>원래 가격 역산</h2>
+    <div class="q"><input data-n="a" inputmode="decimal" placeholder="27,930"> 원이 <input data-n="b" inputmode="decimal" placeholder="30" style="width:80px"> %
+      <select data-n="dir"><option value="-1">할인된</option><option value="1">인상된</option></select> 가격이면 원래 가격은?</div>
+    <p class="ans"></p><p class="how"></p>
+  </section>
+
+  <section class="card calc" id="c6">
+    <h2>부가세 (VAT 10%)</h2>
+    <div class="q"><input data-n="a" inputmode="decimal" placeholder="110,000"> 원은
+      <select data-n="dir"><option value="incl">부가세 포함 금액</option><option value="excl">공급가액 (부가세 별도)</option></select></div>
+    <p class="ans"></p><p class="how"></p>
+  </section>
+
+  <div class="ad"><!-- 광고 슬롯 1 --></div>
+
+  <article>
+    <h2>퍼센트(%)와 퍼센트포인트(%p)는 다른가요?</h2>
+    <p>다릅니다. 금리가 3%에서 4%로 오르면 <b>1%p(퍼센트포인트) 상승</b>이지만, 증가율로는 (4−3)÷3 = <b>33.3% 상승</b>입니다. 비율끼리의 차이는 %p, 값이 얼마나 변했는지의 비율은 %로 말합니다.</p>
+    <h2>30% 할인 후 다시 30% 오르면 원래 가격인가요?</h2>
+    <p>아닙니다. 10,000원을 30% 할인하면 7,000원이고, 7,000원에서 30% 오르면 9,100원입니다. 기준 금액이 바뀌기 때문에 같은 비율로 내렸다 올려도 원래 값으로 돌아오지 않습니다. 원래 가격을 알고 싶다면 '원래 가격 역산'을 쓰세요. 7,000원이 30% 할인된 가격이면 원래 가격은 7,000 ÷ 0.7 = 10,000원입니다.</p>
+    <h2>중복 할인은 어떻게 계산하나요?</h2>
+    <p>20% 할인에 추가 10% 할인은 30% 할인이 아니라 0.8 × 0.9 = 0.72, 즉 <b>28% 할인</b>입니다. '할인가' 칸에서 먼저 20% 할인가를 구한 뒤, 그 결과를 다시 넣고 10%를 할인하면 됩니다.</p>
+    <h2>부가세는 어떻게 계산하나요?</h2>
+    <p>부가세 포함 금액을 1.1로 나누면 공급가액, 나머지가 부가세입니다. 예를 들어 110,000원은 공급가액 100,000원 + 부가세 10,000원입니다. 세금계산서에서는 원 단위 미만을 버리는 경우가 많아 1원 차이가 날 수 있습니다.</p>
+  </article>
+
+  <div class="ad"><!-- 광고 슬롯 2 --></div>
+</main>
+<footer>© 작은 도구들 · <a href="../privacy.html">개인정보처리방침</a></footer>
+
+<script>
+const num = s => { if (s == null) return NaN; const t = String(s).replace(/,/g, '').trim(); return t === '' || t === '-' ? NaN : +t; };
+const f = (n, d = 2) => (Math.round(n * 10 ** d) / 10 ** d).toLocaleString('ko-KR', {maximumFractionDigits: d});
+const won = n => f(n, 0) + '원';
+const sign = n => n > 0 ? 'up' : n < 0 ? 'down' : '';
+
+const CALC = {
+  c1: ({a, b}) => isNaN(a) || isNaN(b) ? null :
+    [f(a * b / 100, 4), `${f(a, 4)} × ${f(b, 4)} ÷ 100`],
+  c2: ({a, b}) => isNaN(a) || isNaN(b) || b === 0 ? null :
+    [f(a / b * 100, 4) + '%', `${f(a, 4)} ÷ ${f(b, 4)} × 100`],
+  c3: ({a, b}) => {
+    if (isNaN(a) || isNaN(b) || a === 0) return null;
+    const r = (b - a) / Math.abs(a) * 100, d = b - a;
+    const word = r > 0 ? '증가' : r < 0 ? '감소' : '변화 없음';
+    const p = n => n < 0 ? `(${f(n, 4)})` : f(n, 4);
+    return [`<span class="${sign(r)}">${f(Math.abs(r), 2)}% ${word}</span>`, `차이 ${d > 0 ? '+' : ''}${f(d, 4)} · (${p(b)} − ${p(a)}) ÷ ${f(Math.abs(a), 4)} × 100`, true];
+  },
+  c4: ({a, b, dir}) => {
+    if (isNaN(a) || isNaN(b)) return null;
+    const diff = a * b / 100, r = a + dir * diff;
+    return [won(r), `${dir < 0 ? '할인' : '인상'} 금액 ${won(diff)} · ${f(a, 4)} × ${f(1 + dir * b / 100, 4)}`];
+  },
+  c5: ({a, b, dir}) => {
+    if (isNaN(a) || isNaN(b)) return null;
+    const k = 1 + dir * b / 100;
+    if (k <= 0) return ['계산할 수 없습니다', '할인율은 100% 미만이어야 합니다'];
+    const o = a / k;
+    return [won(o), `${f(a, 4)} ÷ ${f(k, 4)} · ${dir < 0 ? '할인' : '인상'} 금액 ${won(Math.abs(o - a))}`];
+  },
+  c6: ({a, dir}) => {
+    if (isNaN(a)) return null;
+    if (dir === 'incl') { const s = Math.round(a / 1.1), v = a - s; return [`공급가액 ${won(s)} + 부가세 ${won(v)}`, `${f(a, 0)} ÷ 1.1 = ${f(a / 1.1, 2)}`, true]; }
+    const v = Math.round(a * 0.1); return [`합계 ${won(a + v)} (부가세 ${won(v)})`, `${f(a, 0)} × 0.1 = ${f(a * 0.1, 2)}`, true];
+  },
+};
+
+function run(sec) {
+  const v = {};
+  sec.querySelectorAll('[data-n]').forEach(el => {
+    v[el.dataset.n] = el.tagName === 'SELECT' ? (isNaN(+el.value) ? el.value : +el.value) : num(el.value);
+  });
+  const r = CALC[sec.id](v), ans = sec.querySelector('.ans'), how = sec.querySelector('.how');
+  if (!r) { ans.textContent = how.textContent = ''; return; }
+  if (r[2] || /<span/.test(r[0])) ans.innerHTML = r[0]; else ans.textContent = r[0];
+  how.textContent = r[1];
+}
+
+function fmtInput(el) {
+  const pos = el.value.length - el.selectionStart;
+  let t = el.value.replace(/[^\d.\-]/g, '').replace(/(?!^)-/g, '');
+  const [i, ...d] = t.split('.');
+  const neg = i.startsWith('-'), ii = i.replace('-', '');
+  t = (neg ? '-' : '') + (ii ? (+ii).toLocaleString('ko-KR') : '') + (d.length ? '.' + d.join('') : '');
+  el.value = t;
+  try { el.setSelectionRange(t.length - pos, t.length - pos); } catch (e) {}
+}
+
+const secs = document.querySelectorAll('.calc');
+secs.forEach(sec => {
+  sec.querySelectorAll('input').forEach(el => el.addEventListener('input', () => { fmtInput(el); run(sec); save(); }));
+  sec.querySelectorAll('select').forEach(el => el.addEventListener('change', () => { run(sec); save(); }));
+  const ans = sec.querySelector('.ans');
+  ans.title = '눌러서 복사';
+  ans.addEventListener('click', async () => {
+    const t = ans.textContent; if (!t) return;
+    try { await navigator.clipboard.writeText(t); const o = ans.innerHTML; ans.textContent = '복사됨'; setTimeout(() => { ans.innerHTML = o; }, 800); } catch (e) {}
+  });
+});
+
+function save() {
+  const st = {};
+  secs.forEach(sec => sec.querySelectorAll('[data-n]').forEach(el => st[sec.id + el.dataset.n] = el.value));
+  try { localStorage.setItem('pc-state', JSON.stringify(st)); } catch (e) {}
+}
+let st = {};
+try { st = JSON.parse(localStorage.getItem('pc-state') || '{}'); } catch (e) {}
+secs.forEach(sec => { sec.querySelectorAll('[data-n]').forEach(el => { const v = st[sec.id + el.dataset.n]; if (v != null) el.value = v; }); run(sec); });
+</script>
+</body>
+</html>
