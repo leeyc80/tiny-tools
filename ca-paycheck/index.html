@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>캐나다 실수령액 계산기 2026 - 시급·연봉 세금, CPP, EI 공제 (워홀·유학생)</title>
+<meta name="description" content="캐나다 시급이나 연봉을 넣으면 2026년 기준 연방·주 소득세, CPP, EI를 빼고 한 번에 받는 실수령액을 계산합니다. 온타리오, BC, 앨버타 지원, 원화 환산 가능. 워킹홀리데이·유학생·이민자를 위한 한국어 계산기.">
+<link rel="canonical" href="https://leeyc80.github.io/tiny-tools/ca-paycheck/">
+<link rel="alternate" hreflang="ko" href="https://leeyc80.github.io/tiny-tools/ca-paycheck/">
+<link rel="alternate" hreflang="en" href="https://leeyc80.github.io/tiny-tools/ca-paycheck/en/">
+<meta property="og:title" content="캐나다 실수령액 계산기 2026 - 시급·연봉 세금 계산">
+<meta property="og:description" content="연방·주 소득세, CPP, EI 공제 후 실수령액과 원화 환산">
+<meta property="og:type" content="website">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="style.css">
+<!-- AdSense: 승인 후 ca-pub 값 교체 후 주석 해제
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+-->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"캐나다 실수령액 계산기","applicationCategory":"FinanceApplication","operatingSystem":"Any","inLanguage":"ko","offers":{"@type":"Offer","price":"0","priceCurrency":"CAD"}}
+</script>
+</head>
+<body>
+<header><a href="../">← 모든 도구</a> · <a href="en/">English</a></header>
+<main>
+  <h1>캐나다 실수령액 계산기 <small>2026</small></h1>
+  <p class="lead">시급이나 연봉을 넣으면 세금과 CPP·EI를 뺀 실제로 받는 금액을 계산합니다.</p>
+
+  <div id="app"></div>
+  <p class="note">추정치입니다. 기본 공제(TD1 기본값)만 적용하며 퀘벡은 지원하지 않습니다. 정확한 원천징수액은 <a href="https://www.canada.ca/en/revenue-agency/services/e-services/digital-services-businesses/payroll-deductions-online-calculator.html" rel="noopener">CRA 공식 계산기(PDOC)</a>로 확인하세요.</p>
+
+  <div class="ad"><!-- 광고 슬롯 1 --></div>
+
+  <article>
+    <h2>급여에서 무엇이 빠지나요?</h2>
+    <ul>
+      <li><b>CPP (Canada Pension Plan)</b>: 국민연금에 해당합니다. 연 $3,500을 넘는 소득의 5.95%, 2026년 최대 $4,230.45입니다. 연 소득이 $74,600을 넘으면 그 위 $85,000까지 4%의 CPP2가 추가로 붙습니다.</li>
+      <li><b>EI (Employment Insurance)</b>: 고용보험입니다. 소득의 1.63%, 연 최대 $1,123.07입니다.</li>
+      <li><b>연방 소득세</b>: 2026년 세율은 14% / 20.5% / 26% / 29% / 33%입니다. 누구나 $16,452까지는 기본공제로 세금이 없습니다.</li>
+      <li><b>주 소득세</b>: 주마다 다릅니다. 온타리오는 5.05%부터 시작하고 건강보험료(Ontario Health Premium)가 붙고, BC는 저소득자 감면이 있으며, 앨버타는 기본공제가 $22,769로 큽니다.</li>
+    </ul>
+    <h2>워홀·유학생도 세금을 똑같이 내나요?</h2>
+    <p>캐나다에서 일하면 고용주가 급여에서 세금, CPP, EI를 먼저 떼고 줍니다. 1년 미만 체류한 워홀러는 연간 소득이 적어 이듬해 세금 신고(Tax return)를 하면 미리 뗀 소득세 일부를 돌려받는 경우가 많습니다. 이 계산기는 1년 내내 같은 조건으로 일했을 때를 기준으로 합니다.</p>
+    <h2>휴가수당(Vacation pay)은 뭔가요?</h2>
+    <p>시급제 직원은 법에 따라 휴가수당을 받습니다. 온타리오·BC·앨버타는 근속 5년 미만이면 4%, 5년 이상이면 6%가 일반적입니다. 매 급여에 포함해 주는 회사라면 4%를 선택하세요.</p>
+    <h2>초과근무(Overtime)는 어떻게 계산하나요?</h2>
+    <p>온타리오·앨버타는 주 44시간, BC는 하루 8시간·주 40시간을 넘으면 1.5배를 받습니다. 정규 시간과 초과 시간을 나눠 넣으세요.</p>
+    <h2>얼마나 정확한가요?</h2>
+    <p>CRA가 고용주에게 배포하는 2026년 원천징수 공식(T4127)과 TD1 기본공제를 그대로 적용했습니다. 다만 1년 내내 같은 금액을 받는다고 가정한 연간 계산이라, 연 중간에 일을 시작했거나 급여가 들쭉날쭉하면 실제 급여명세서와 차이가 날 수 있습니다. BC는 2026년 7월 세율 변경을 연간 기준으로 반영했습니다.</p>
+  </article>
+
+  <div class="ad"><!-- 광고 슬롯 2 --></div>
+</main>
+<footer>© 작은 도구들 · <a href="../privacy.html">개인정보처리방침</a> · 2026년 세율 기준</footer>
+<script src="calc.js"></script>
+</body>
+</html>

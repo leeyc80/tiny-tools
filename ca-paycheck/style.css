@@ -1,0 +1,27 @@
+header a{margin-right:2px}
+h1 small{font-size:15px;color:var(--muted);font-weight:500}
+.field{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.field>label:first-child{font-size:14px;color:var(--muted);width:118px;flex:none}
+.field input,.field select{padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);font:inherit;min-width:0}
+.field input{width:auto;flex:0 1 140px;text-align:right;font-variant-numeric:tabular-nums}
+.field select{flex:0 1 auto;max-width:100%}
+.pre,.hint{color:var(--muted);font-size:14px}
+.seg{display:flex;gap:6px}
+.seg button[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:#fff}
+[hidden]{display:none!important}
+.big{font-size:40px;font-weight:700;letter-spacing:-1px;margin:4px 0 0;font-variant-numeric:tabular-nums}
+.conv{font-size:19px;font-weight:600;margin:2px 0 0;color:var(--accent);font-variant-numeric:tabular-nums}
+.conv:empty{display:none}
+.sub{color:var(--muted);margin:0;font-size:14px}
+.tbl{width:100%;border-collapse:collapse;margin-top:14px;font-size:15px;font-variant-numeric:tabular-nums}
+.tbl th,.tbl td{padding:7px 4px;border-bottom:1px solid var(--line);text-align:right}
+.tbl th:first-child,.tbl td:first-child{text-align:left}
+.tbl th{font-size:13px;color:var(--muted);font-weight:500}
+.tbl tr.tot td{font-weight:600}
+.tbl tr.net td{font-weight:700;color:var(--accent);border-bottom:none}
+.check{display:flex;gap:6px;align-items:center;margin-top:12px;font-size:14px;color:var(--muted)}
+.note{font-size:13px;color:var(--muted)}
+.note a{color:var(--accent)}
+article ul{padding-left:20px}
+article li{margin-bottom:6px}
+@media (max-width:400px){.field>label:first-child{width:96px}}
